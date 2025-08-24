@@ -35,7 +35,7 @@ python PowerShellMonitor.py
 
 ### 打包为可执行文件
 
-你可以直接下载dist目录下的exe文件使用
+你可以直接下载release
 
 或者使用 PyInstaller 将程序打包为独立的可执行文件：
 

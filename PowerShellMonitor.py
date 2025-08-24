@@ -4,6 +4,7 @@ import subprocess
 import threading
 import winreg
 import configparser
+import atexit
 from datetime import datetime
 from pathlib import Path
 from PySide6.QtWidgets import (QApplication, QSystemTrayIcon, QMenu,
@@ -12,7 +13,6 @@ from PySide6.QtWidgets import (QApplication, QSystemTrayIcon, QMenu,
 from PySide6.QtGui import QIcon, QAction, QFont, QTextCursor
 from PySide6.QtCore import Qt, QObject, Signal
 
-from icon import create_icon
 
 # 默认配置值
 DEFAULT_PS_COMMAND = """
@@ -25,12 +25,85 @@ while ($true) {
 }
 """
 
+# 获取程序所在目录
+if getattr(sys, 'frozen', False):
+    # 如果是打包后的可执行文件
+    APP_DIR = os.path.dirname(sys.executable)
+else:
+    # 如果是脚本运行
+    APP_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# 配置文件路径
+CONFIG_FILE = os.path.join(APP_DIR, "config.ini")
+LOG_FILE = os.path.join(APP_DIR, "powershell_output.log")
+
 DEFAULT_TIME = False
-CONFIG_FILE = "config.ini"
 
 # 初始化配置变量
 PS_COMMAND = DEFAULT_PS_COMMAND
 TIME = DEFAULT_TIME
+
+
+def check_single_instance(app_name="PowerShellTrayManager"):
+    """使用文件锁检查是否已有实例在运行"""
+    # 创建锁文件路径
+    lock_file = Path(os.environ.get('TEMP', '')) / f"{app_name}.lock"
+
+    try:
+        # 检查锁文件是否存在
+        if lock_file.exists():
+            # 读取锁文件中的进程ID
+            try:
+                with open(lock_file, 'r') as f:
+                    pid = int(f.read().strip())
+
+                # 检查该进程是否仍在运行
+                if is_process_running(pid):
+                    QMessageBox.warning(
+                        None,
+                        "程序已运行",
+                        "PowerShell Tray Manager 已经在运行中，请检查系统托盘。"
+                    )
+                    return False
+            except:
+                # 如果读取失败，可能是陈旧的锁文件
+                pass
+
+        # 创建锁文件并写入当前进程ID
+        with open(lock_file, 'w') as f:
+            f.write(str(os.getpid()))
+
+        # 注册退出时清理锁文件的函数
+        atexit.register(cleanup_lock_file, lock_file)
+
+        return True
+    except Exception as e:
+        print(f"检查单实例时出错: {e}")
+        return True
+
+
+def is_process_running(pid):
+    """检查指定PID的进程是否在运行"""
+    try:
+        # 在Windows上，我们可以尝试向进程发送信号0（不实际发送信号，只检查权限）
+        import ctypes
+        kernel32 = ctypes.windll.kernel32
+        handle = kernel32.OpenProcess(0x1000, False, pid)  # PROCESS_QUERY_INFORMATION
+        if handle:
+            kernel32.CloseHandle(handle)
+            return True
+        return False
+    except:
+        return False
+
+
+def cleanup_lock_file(lock_file):
+    """清理锁文件"""
+    try:
+        if os.path.exists(lock_file):
+            os.remove(lock_file)
+    except:
+        pass
 
 
 def load_config():
@@ -134,7 +207,7 @@ class SystemTrayApp(QSystemTrayIcon):
         # 初始化变量
         self.is_running = False
         self.process = None
-        self.log_file = "powershell_output.log"
+        self.log_file = LOG_FILE
         self.comm = Communicate()
         self.log_dialog = None
 
@@ -426,6 +499,10 @@ class SystemTrayApp(QSystemTrayIcon):
 
 
 def main():
+    # 检查是否已有实例在运行
+    if not check_single_instance():
+        sys.exit(0)
+
     # 创建应用程序实例
     app = QApplication(sys.argv)
     app.setQuitOnLastWindowClosed(False)

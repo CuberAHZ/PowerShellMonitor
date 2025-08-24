@@ -1,0 +1,1 @@
+pyinstaller -i ps.ico --onefile --windowed --name PowerShellMonitor PowerShellMonitor.py

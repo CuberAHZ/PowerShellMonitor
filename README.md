@@ -1,4 +1,4 @@
-# PowerShell Tray Manager
+# PowerShellMonitor
 
 > 一个基于 PySide6 的系统托盘应用程序，用于监控和管理 PowerShell 进程或任何其他可执行程序。
 

@@ -1,20 +1,20 @@
 from PySide6.QtGui import QPixmap, QPainter, QColor
 from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QApplication  # 添加这行导入
-import sys  # 添加这行导入
+from PySide6.QtWidgets import QApplication
+import sys
 
 
 def create_icon(size):
     """创建指定尺寸的图标"""
     pixmap = QPixmap(size, size)
-    pixmap.fill(QColor(0, 0, 0, 0))  # 透明背景
+    pixmap.fill(QColor(0, 0, 0, 0))
 
     painter = QPainter(pixmap)
     painter.setRenderHint(QPainter.Antialiasing)
 
     # 绘制圆形背景
     painter.setBrush(QColor(50, 150, 250))
-    margin = size // 8  # 边距为尺寸的1/8
+    margin = size // 8
     painter.drawEllipse(margin, margin, size - 2 * margin, size - 2 * margin)
 
     painter.setPen(QColor(255, 255, 255))
@@ -39,11 +39,7 @@ def create_and_save_icons():
 
 
 if __name__ == "__main__":
-    # 创建 QApplication 实例
     app = QApplication(sys.argv)
 
-    # 创建并保存图标
     create_and_save_icons()
-
-    # 不需要进入事件循环，直接退出
     sys.exit(0)

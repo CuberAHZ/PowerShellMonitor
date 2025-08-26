@@ -17,13 +17,11 @@ def create_icon(size):
     margin = size // 8  # 边距为尺寸的1/8
     painter.drawEllipse(margin, margin, size - 2 * margin, size - 2 * margin)
 
-    # 绘制文字（仅在较大尺寸时显示）
-    if size >= 32:
-        painter.setPen(QColor(255, 255, 255))
-        font = painter.font()
-        font.setPixelSize(size // 2)
-        painter.setFont(font)
-        painter.drawText(pixmap.rect(), Qt.AlignCenter, "PS")
+    painter.setPen(QColor(255, 255, 255))
+    font = painter.font()
+    font.setPixelSize(size // 2)
+    painter.setFont(font)
+    painter.drawText(pixmap.rect(), Qt.AlignCenter, "PS")
 
     painter.end()
     return pixmap

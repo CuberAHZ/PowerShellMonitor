@@ -1,10 +1,15 @@
+import os
 from PySide6.QtWidgets import (QDialog, QVBoxLayout, QHBoxLayout,
-                               QPushButton, QTextEdit)
+                               QPushButton, QTextEdit, QMessageBox)
 from PySide6.QtGui import QIcon, QFont, QTextCursor
 from PySide6.QtCore import Qt
 
+from utils import get_app_dir
+
 
 class LogDialog(QDialog):
+    """输入日志"""
+
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setWindowTitle("PowerShell 输出日志")
@@ -36,10 +41,10 @@ class LogDialog(QDialog):
         self.close_button.clicked.connect(self.accept)
 
     def create_icon(self):
-        # 创建一个简单的程序图标
+        """创建程序图标"""
         from PySide6.QtGui import QPixmap, QPainter, QColor
         pixmap = QPixmap(32, 32)
-        pixmap.fill(QColor(0, 0, 0, 0))  # 透明背景
+        pixmap.fill(QColor(0, 0, 0, 0))
         painter = QPainter(pixmap)
         painter.setRenderHint(QPainter.Antialiasing)
         painter.setBrush(QColor(50, 150, 250))
@@ -50,9 +55,17 @@ class LogDialog(QDialog):
         return pixmap
 
     def clear_log(self):
+        """清除日志"""
         self.text_edit.clear()
+        log_file = os.path.join(get_app_dir(), "powershell_output.log")
+        try:
+            with open(log_file, "w", encoding="utf-8") as f:
+                f.write("")
+        except Exception as e:
+            QMessageBox.critical(self, "PowerShell 输出日志", f"清空日志失败: {e}")
 
     def append_text(self, text):
+        """添加文本"""
         self.text_edit.append(text)
         # 自动滚动到底部
         cursor = self.text_edit.textCursor()

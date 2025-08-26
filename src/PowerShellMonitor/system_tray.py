@@ -72,10 +72,10 @@ class SystemTrayApp(QSystemTrayIcon):
         self.showMessage("PowerShell 监控器", "程序已启动并在后台运行", QSystemTrayIcon.Information, 2000)
 
     def create_icon(self):
-        # 创建一个简单的程序图标
+        """创建图标"""
         from PySide6.QtGui import QPixmap, QPainter, QColor
         pixmap = QPixmap(32, 32)
-        pixmap.fill(QColor(0, 0, 0, 0))  # 透明背景
+        pixmap.fill(QColor(0, 0, 0, 0))
         painter = QPainter(pixmap)
         painter.setRenderHint(QPainter.Antialiasing)
         painter.setBrush(QColor(50, 150, 250))

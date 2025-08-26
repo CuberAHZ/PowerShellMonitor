@@ -114,4 +114,3 @@ class ProcessManager(QObject):
                     f.write(text)
         except Exception as e:
             self.update_signal.emit(f"写入日志文件时出错: {e}")
-            

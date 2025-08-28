@@ -1,0 +1,1 @@
+pyinstaller -i mps.ico --onefile --windowed --name PowerShellMonitor main.py -p "D:\Python\PowerShellMonitor\src\PowerShellMonitor v1"

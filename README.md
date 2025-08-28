@@ -1,17 +1,27 @@
-# PowerShellMonitor
+# PowerShellMonitor v1.0.0
 
-> 一个基于 PySide6 的系统托盘应用程序，用于监控和管理 PowerShell 进程或任何其他可执行程序。
+> 一个基于 PySide6 的系统托盘应用程序，用于监控和管理多个 PowerShell 进程或其他可执行程序。
+
+## 🎉 v1.0.0 新特性
+
+- **多任务管理** - 同时管理多个 PowerShell 进程或可执行程序
+- **可视化任务管理器** - 全新的图形化任务管理界面
+- **任务配置编辑器** - 直观的任务创建和编辑界面
+- **独立日志系统** - 每个任务有独立的日志文件和控制台
+- **增强的系统托盘菜单** - 支持多任务快速操作
+- **任务状态实时显示** - 实时显示每个任务的运行状态
 
 ## 功能特点
 
 - 🖥️ **系统托盘集成** - 在系统托盘中运行，不占用任务栏空间
-- ⚡ **进程管理** - 启动、停止和监控 PowerShell 或其他可执行程序
-- 📊 **实时日志** - 查看进程的实时输出日志
-- ⏰ **时间戳选项** - 可选择是否在日志中添加时间戳
-- 🔧 **配置文件** - 通过配置文件自定义要运行的命令
-- 🔄 **重新加载配置** - 无需重启程序即可应用配置更改
+- ⚡ **多进程管理** - 同时启动、停止和监控多个 PowerShell 或其他可执行程序
+- 📊 **独立日志系统** - 每个任务有独立的日志文件和查看器
+- ⏰ **时间戳选项** - 可为每个任务单独配置是否在日志中添加时间戳
+- 🔧 **可视化配置** - 图形化界面管理任务配置
+- 🔄 **实时重载配置** - 无需重启程序即可应用配置更改
 - 🚀 **开机自启动** - 支持设置开机自动启动
 - 🔒 **单实例运行** - 防止程序重复打开
+- 📋 **任务状态监控** - 实时显示每个任务的运行状态
 
 ## 安装和运行
 
@@ -19,7 +29,7 @@
 
 - Python 3.7 或更高版本
 - PySide6 库
-- windows8.1 及以上
+- Windows 8.1 及以上
 
 ### 安装依赖
 
@@ -30,47 +40,50 @@ pip install PySide6
 ### 运行程序
 
 ```bash
-python PowerShellMonitor.py
+python main.py
 ```
 
 ### 打包为可执行文件
 
-你可以直接下载release
-
-或者使用 PyInstaller 将程序打包为独立的可执行文件：
+你可以直接下载 release 版本，或使用 PyInstaller 将程序打包为独立的可执行文件：
 
 ```bash
 pip install pyinstaller
-pyinstaller -i ps.ico --onefile --windowed --name PowerShellMonitor PowerShellMonitor.py
+pyinstaller -i mps.ico --onefile --windowed --name PowerShellMonitor main.py -p "C:\Path\to\PowerShellMonitor v1"
 ```
 
 打包后的可执行文件将位于 `dist` 目录中。
 
 ## 配置说明
 
-程序会在首次运行时自动创建配置文件 `config.ini`，包含以下选项：
+程序会在首次运行时自动创建配置文件 `config.ini`，使用 JSON 格式存储多个任务配置：
 
-### PS_COMMAND
-要执行的 PowerShell 命令或可执行文件路径。
+### 配置文件结构
 
-默认值：
 ```ini
-PS_COMMAND = while ($true) {
-    Write-Output "当前时间: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
-    Write-Output "进程ID: $PID"
-    Write-Output "运行状态: 正常"
-    Write-Output "---"
-    Start-Sleep -Seconds 5
+[DEFAULT]
+TASKS = {
+  "task1": {
+    "name": "示例任务 1",
+    "enabled": true,
+    "ps_command": "while ($true) {\n    Write-Output \"当前时间: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')\"\n    Start-Sleep -Seconds 5\n}",
+    "time_stamp": true
+  },
+  "task2": {
+    "name": "示例任务 2",
+    "enabled": false,
+    "ps_command": "D:\\path\\to\\your\\program.exe -argument",
+    "time_stamp": false
+  }
 }
 ```
 
-### TIME
-是否在日志中添加时间戳。
+### 任务配置选项
 
-默认值：
-```ini
-TIME = False
-```
+- **name**: 任务名称（显示用）
+- **enabled**: 是否启用此任务（启动时自动运行）
+- **ps_command**: PowerShell 命令或可执行文件路径
+- **time_stamp**: 是否在日志中添加时间戳
 
 ## 使用说明
 
@@ -78,34 +91,25 @@ TIME = False
 
 右键点击系统托盘图标可访问以下功能：
 
-- **查看状态** - 打开日志窗口，显示进程输出
-- **停止/运行** - 切换进程的运行状态
-- **开机自启动** - 启用或禁用开机自动启动
-- **重新加载配置** - 重新读取配置文件并应用更改
-- **退出** - 停止进程并退出程序
+![img](image/img.png)
+
+### 任务管理器
+
+通过任务管理器可以：
+
+![img](image/img_1.png)
+
+### 任务编辑器
+
+任务编辑器提供直观的界面来配置任务：
+
+![img](image/img_2.png)
 
 ### 日志查看
 
-点击"查看状态"打开日志窗口，您可以：
-- 查看进程的实时输出
-- 清空日志内容
-- 关闭窗口后再次打开时会重新加载最新日志
+每个任务都有独立的日志文件，可以通过任务菜单或任务管理器查看：
 
-### 自定义命令
-
-要运行自定义命令或程序，编辑 `config.ini` 文件中的 `PS_COMMAND` 选项：
-
-1. 对于 PowerShell 命令：
-   ```ini
-   PS_COMMAND = your-powershell-command-here
-   ```
-
-2. 对于可执行文件：
-   ```ini
-   PS_COMMAND = C:\path\to\your\program.exe --arguments
-   ```
-
-编辑配置文件后，点击"重新加载配置"菜单项应用更改。
+![img](image/img_3.png)
 
 ## 故障排除
 
@@ -135,18 +139,30 @@ TIME = False
 2. 确保所有依赖项已正确安装
 3. 验证配置文件格式是否正确
 
+项目地址: https://github.com/CuberAHZ/PowerShellMonitor
+作者邮箱: my@cuberliu.xyz
+
 ## 许可证
 
 本项目使用 MIT 许可证。有关详细信息，请参阅 LICENSE 文件。
 
 ## 更新日志
 
+### v1.0.0
+- ✨ **全新多任务架构** - 支持同时管理多个 PowerShell 进程或可执行程序
+- 🎨 **可视化任务管理器** - 新增图形化任务管理界面
+- 📝 **任务配置编辑器** - 直观的任务创建和编辑界面
+- 📁 **独立日志系统** - 每个任务有独立的日志文件和控制台
+- 🖱️ **增强的系统托盘菜单** - 支持多任务快速操作
+- 🔄 **实时状态显示** - 实时显示每个任务的运行状态
+- 🎯 **任务启用/禁用** - 可配置任务是否在启动时自动运行
+
 ### v0.1.2
-- 修复🛠️：修复了日志窗口无法清除日志的问题
-- 筹划💕：正在准备v1版本
+- 🛠️ 修复了日志窗口无法清除日志的问题
+- 💕 筹划 v1 版本多任务功能
 
 ### v0.1.1
-- 🛠️优化项目结构
+- 🛠️ 优化项目结构
 
 ### v0.1.0
 - 初始版本发布

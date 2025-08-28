@@ -1,1 +1,1 @@
-pyinstaller -i ps.ico --onefile --windowed --name PowerShellMonitor PowerShellMonitor.py
+pyinstaller -i ps.ico --onefile --windowed --name PowerShellMonitor main.py -p D:\Python\PowerShellMonitor\src\PowerShellMonitor
